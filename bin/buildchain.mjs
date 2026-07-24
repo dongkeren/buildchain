@@ -108,6 +108,11 @@ import {
   createCandidateTimeline,
   formatCandidateTimelineReport,
 } from "../packages/core/candidate-timeline.js";
+import {
+  createGitHubArtifactAttestationPolicy,
+  createGitHubArtifactAttestationVerificationPlan,
+  verifyGitHubArtifactAttestationEvidence,
+} from "../packages/core/github-artifact-attestation.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const embeddedPackageVersion = process.env.BUILDCHAIN_EMBEDDED_PACKAGE_VERSION || "";
@@ -171,13 +176,18 @@ function usage() {
                                     [--kfd-3-artifact-verify-cmd <command>]
                                     [--invariant-passport-json <json-or-path>]...
                                     [--invariant-passport-cmd <command>]
+                                    [--github-artifact-attestation-policy-json <json-or-path>]...
                                     [--kfd-agent-hub-evidence-json <json-or-path>]
                                     [--base-passport-json <json-or-path>] [--require-base-kfd]
                                     [--release-extra-json <json-or-path>]
                                     [--publish-json <json-or-path>] [--output-dir <dir>] [--json]
   buildchain create publication-admission --input-json <file-or-json> [--output <file>] [--json]
   buildchain create runner-provenance --input-json <file-or-json> [--output <file>] [--json]
+  buildchain create github-artifact-attestation-policy --input-json <file-or-json> [--output <file>] [--json]
   buildchain verify release-passport <file-or-url> [--json]
+  buildchain verify github-artifact-attestation <artifact>
+                          --evidence <file> --bundle <file>
+                          --platform-manifest <file> --release-passport <file> [--json]
   buildchain verify publication-admission <file-or-json>
                           --registry-json <file-or-json>
                           --runner-json <file-or-json>
@@ -1793,13 +1803,19 @@ async function main(argv = process.argv.slice(2)) {
   if (command === "create") {
     const [subcommand = "", ...createArgs] = args;
     const inputValue = readFlag(createArgs, "input-json", "");
-    if (!inputValue || !["publication-admission", "runner-provenance"].includes(subcommand)) {
-      throw new Error("usage: buildchain create <publication-admission|runner-provenance> --input-json <file-or-json> [--output <file>]");
+    if (!inputValue || ![
+      "publication-admission",
+      "runner-provenance",
+      "github-artifact-attestation-policy",
+    ].includes(subcommand)) {
+      throw new Error("usage: buildchain create <publication-admission|runner-provenance|github-artifact-attestation-policy> --input-json <file-or-json> [--output <file>]");
     }
     const input = readJsonInput(inputValue, { label: "input-json" });
     const value = subcommand === "publication-admission"
       ? createPublicationAdmission(input)
-      : createRunnerProvenance(input);
+      : subcommand === "runner-provenance"
+        ? createRunnerProvenance(input)
+        : createGitHubArtifactAttestationPolicy(input);
     const output = readFlag(createArgs, "output", "");
     if (output) writeJsonFile(path.resolve(output), value);
     if (!output || readBooleanFlag(createArgs, "json")) printJson(value);
@@ -1854,6 +1870,10 @@ async function main(argv = process.argv.slice(2)) {
       kfd3ArtifactVerifyCommand: readFlag(collectArgs, "kfd-3-artifact-verify-cmd", ""),
       invariantPassportJsons: readRepeatedFlag(collectArgs, "invariant-passport-json"),
       invariantPassportCommand: readFlag(collectArgs, "invariant-passport-cmd", ""),
+      githubArtifactAttestationPolicyJsons: readRepeatedFlag(
+        collectArgs,
+        "github-artifact-attestation-policy-json",
+      ),
       kfdAgentHubEvidenceJson: readFlag(collectArgs, "kfd-agent-hub-evidence-json", ""),
       basePassportJson: readFlag(collectArgs, "base-passport-json", ""),
       requireBaseKfd: readBooleanFlag(collectArgs, "require-base-kfd"),
@@ -1889,6 +1909,61 @@ async function main(argv = process.argv.slice(2)) {
 
   if (command === "verify") {
     const [subcommand = "", location = "", ...verifyArgs] = args;
+    if (subcommand === "github-artifact-attestation") {
+      if (!location) {
+        throw new Error("usage: buildchain verify github-artifact-attestation <artifact> --evidence <file> --bundle <file> --platform-manifest <file> --release-passport <file>");
+      }
+      const requiredPath = (name) => {
+        const value = readFlag(verifyArgs, name, "");
+        if (!value) {
+          throw new Error(`buildchain verify github-artifact-attestation requires --${name} <file>`);
+        }
+        return path.resolve(value);
+      };
+      const evidencePath = requiredPath("evidence");
+      const bundlePath = requiredPath("bundle");
+      const platformManifestPath = requiredPath("platform-manifest");
+      const releasePassportPath = requiredPath("release-passport");
+      const evidence = readJsonInput(evidencePath, { label: "evidence" });
+      const plan = createGitHubArtifactAttestationVerificationPlan({
+        artifactPath: location,
+        bundlePath,
+        evidence,
+      });
+      const verified = spawnSync(plan.command, plan.args, {
+        cwd: process.cwd(),
+        encoding: "utf8",
+        maxBuffer: 32 * 1024 * 1024,
+      });
+      if (verified.error) throw verified.error;
+      if (verified.status !== 0) {
+        throw new Error(`gh attestation verify failed: ${(verified.stderr || verified.stdout || "unknown error").trim()}`);
+      }
+      let verificationResults;
+      try {
+        verificationResults = JSON.parse(verified.stdout);
+      } catch (error) {
+        throw new Error(`gh attestation verify returned invalid JSON: ${error.message}`);
+      }
+      const report = verifyGitHubArtifactAttestationEvidence({
+        artifactPath: path.resolve(location),
+        platformManifestPath,
+        releasePassportPath,
+        bundlePath,
+        evidence,
+        verificationResults,
+      });
+      if (readBooleanFlag(verifyArgs, "json")) {
+        printJson(report);
+      } else {
+        process.stdout.write(`GitHub artifact attestation: ${report.outcome}\n`);
+        for (const entry of report.issues) {
+          process.stdout.write(`- ${entry.code}: ${entry.message}\n`);
+        }
+      }
+      process.exitCode = report.ok ? 0 : 1;
+      return;
+    }
     if (subcommand === "publication-admission") {
       if (!location) {
         throw new Error("usage: buildchain verify publication-admission <file-or-json> --registry-json <file-or-json> --runner-json <file-or-json> --control-plane-audit-json <file-or-json> --publication-evidence-json <file-or-json>");

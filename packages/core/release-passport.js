@@ -17,6 +17,9 @@ import {
 import { createSurfaceTimestampPolicy } from "./surface-manifest.js";
 import { validatePublishEvidence as validateTransactionPublishEvidence } from "./publish-transaction.js";
 import { normalizeControllerReceiptReferences } from "./controller-evidence.js";
+import {
+  normalizeGitHubArtifactAttestationPolicy,
+} from "./github-artifact-attestation.js";
 
 export const RELEASE_PASSPORT_CONTRACT = "kungfu-buildchain-release-passport";
 export const ARTIFACT_EVIDENCE_CONTRACT = "kungfu-buildchain-artifact-evidence";
@@ -1160,6 +1163,7 @@ export function createReleasePassport({
   kfdAgentHubEvidencePath = "",
   controllerReceipts = [],
   controllerReceiptReferences = [],
+  githubArtifactAttestations = [],
 } = {}) {
   const normalizedTag = nonEmptyString(tag, "tag");
   const artifactEvidence = createArtifactEvidence({ assets, repository, tag: normalizedTag, sourceSha, workflow });
@@ -1201,6 +1205,8 @@ export function createReleasePassport({
       : [],
     requirePassed: true,
   });
+  const normalizedGitHubArtifactAttestations = (githubArtifactAttestations || [])
+    .map(normalizeGitHubArtifactAttestationPolicy);
   const publishArtifacts = normalizedPublishEvidence?.artifacts || [];
   const normalizedPublishSummary = normalizePublishSummary({
     packageSet: normalizedPackageSet,
@@ -1329,6 +1335,9 @@ export function createReleasePassport({
     ...(normalizedKfdAgentHub ? { kfdAgentHub: normalizedKfdAgentHub } : {}),
     ...(invariantPassports ? { invariantPassports } : {}),
     ...(normalizedControllerReceipts.length > 0 ? { controllerReceipts: normalizedControllerReceipts } : {}),
+    ...(normalizedGitHubArtifactAttestations.length > 0
+      ? { githubArtifactAttestations: normalizedGitHubArtifactAttestations }
+      : {}),
     versionImpact: normalizedImpact.versionImpact,
     surfaceImpacts: normalizedImpact.surfaceImpacts,
     artifacts: [
@@ -1416,6 +1425,7 @@ export function collectGitHubReleasePassport({
   invariantPassportCommand = "",
   kfdAgentHubEvidenceJson = "",
   controllerReceiptReferences = [],
+  githubArtifactAttestationPolicyJsons = [],
   basePassportJson = "",
   requireBaseKfd = false,
   releaseJsonExtra = "",
@@ -1483,6 +1493,13 @@ export function collectGitHubReleasePassport({
     undefined,
     { cwd, label: "kfdAgentHubEvidenceJson" },
   );
+  const githubArtifactAttestationPolicies = (githubArtifactAttestationPolicyJsons || [])
+    .filter(Boolean)
+    .map((policyJson) => parseJsonInput(policyJson, undefined, {
+      cwd,
+      label: "githubArtifactAttestationPolicyJsons entry",
+    }))
+    .map(normalizeGitHubArtifactAttestationPolicy);
   const kfd3ArtifactWitnesses = [
     ...kfd3ArtifactWitnessMetas.map((meta) => meta.value),
     ...(kfd3ArtifactCommandMeta.value ? [kfd3ArtifactCommandMeta.value] : []),
@@ -1566,6 +1583,7 @@ export function collectGitHubReleasePassport({
       : undefined,
     kfdAgentHubEvidencePath: kfdAgentHubEvidenceMeta.value ? "kfd-agent-hub-evidence.json" : "",
     controllerReceiptReferences,
+    githubArtifactAttestations: githubArtifactAttestationPolicies,
     publishEvidencePath: publishEvidenceMeta.path ? path.relative(resolvedOutputDir, publishEvidenceMeta.path).split(path.sep).join("/") : "",
     transactionStatePath: transactionMeta.path ? path.relative(resolvedOutputDir, transactionMeta.path).split(path.sep).join("/") : "",
     workflow,
@@ -1893,6 +1911,38 @@ export function createReleaseCheckReport({
   validateContract(agentIndex, AGENT_INDEX_CONTRACT, "agentIndex", issues);
   validateContract(productMechanism, PRODUCT_MECHANISM_CONTRACT, "productMechanism", issues);
   validateKfdAgentHubReleaseEvidence(passport?.kfdAgentHub, kfdAgentHubEvidence, issues);
+  for (const [index, value] of (passport?.githubArtifactAttestations || []).entries()) {
+    try {
+      const policy = normalizeGitHubArtifactAttestationPolicy(value);
+      if (policy.caller.sourceSha !== String(passport?.release?.sourceSha || "").toLowerCase()) {
+        issues.push(issue(
+          "error",
+          `githubArtifactAttestations[${index}].caller.sourceSha`,
+          "attestation policy source SHA must match passport.release.sourceSha",
+        ));
+      }
+      const artifact = (passport?.artifacts || []).find((entry) => entry.name === policy.subject.name);
+      if (!artifact) {
+        issues.push(issue(
+          "error",
+          `githubArtifactAttestations[${index}].subject.name`,
+          `attestation subject ${policy.subject.name} is not a Release Passport artifact`,
+        ));
+      } else if (`sha256:${String(artifact.sha256 || "").replace(/^sha256:/, "")}` !== policy.subject.digest) {
+        issues.push(issue(
+          "error",
+          `githubArtifactAttestations[${index}].subject.digest`,
+          `attestation subject ${policy.subject.name} digest differs from the Release Passport artifact`,
+        ));
+      }
+    } catch (error) {
+      issues.push(issue(
+        "error",
+        `githubArtifactAttestations[${index}]`,
+        error.message,
+      ));
+    }
+  }
 
   const tag = passport?.release?.tag || "";
   if (!tag) {

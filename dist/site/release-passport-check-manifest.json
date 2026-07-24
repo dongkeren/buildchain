@@ -36,6 +36,7 @@
       "platformArtifactManifests",
       "distTagPromotion",
       "controllerReceipts",
+      "githubArtifactAttestations",
       "artifacts",
       "evidence",
       "recovery"

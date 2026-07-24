@@ -1,10 +1,9 @@
 {
   "schemaVersion": 1,
   "contract": "kungfu-buildchain-site-manifest",
-  "generatedAt": "2026-07-24T00:28:32.040Z",
-  "publishedAt": "2026-07-24T00:28:32.040Z",
+  "generatedAt": "1970-01-01T00:00:00.000Z",
   "reproducible": true,
-  "timestampPolicy": "ci-injected",
+  "timestampPolicy": "source-date-epoch",
   "deterministicInputs": [
     "README.md",
     "docs/*.md",
@@ -13,13 +12,11 @@
     "packages/core/README.md",
     "package.json#exports",
     "tests/buildchain-inventory.json",
-    "sourceRevision",
     "sourceDateEpoch",
     "package content",
     "declared Buildchain surface manifest contract"
   ],
   "sourceDateEpoch": "0",
-  "sourceRevision": "ac97c62bfce8d1c686718519ccf2fd8f974142e1",
   "timestampPolicyDetails": {
     "contract": "kungfu-buildchain-surface-timestamp-policy",
     "timestampFields": [
@@ -53,7 +50,7 @@
       "path": "docs/MAP.md",
       "plane": "use",
       "exists": true,
-      "digest": "sha256:c9eb92eb02601e1e36cb38d7df93097c582dec2b8dc34f769f58c30fc5190bbe"
+      "digest": "sha256:84bf6ebb5cda9802de233f5e00079dc394abbc0f2322c5d989ee66dd82b41c48"
     },
     {
       "id": "install",
@@ -69,7 +66,15 @@
       "path": "docs/release-passport.md",
       "plane": "verify",
       "exists": true,
-      "digest": "sha256:f10d2f0f9cc694976b2a1d2a61195ed155c1bc24c964de1551475882e8197c92"
+      "digest": "sha256:f5b504d845aee4f0e5e9464370fbcaacd6362454be9927c6494aac36d598f332"
+    },
+    {
+      "id": "github-artifact-attestation",
+      "title": "GitHub-native Linux artifact attestation",
+      "path": "docs/github-artifact-attestation.md",
+      "plane": "verify",
+      "exists": true,
+      "digest": "sha256:0dc16597e9ea4c0906bb0bc888fb7ac68b9f2ff19c2087f94bebd64bb8c834bd"
     },
     {
       "id": "controller-evidence",
@@ -133,7 +138,7 @@
       "path": "docs/binary-distribution.md",
       "plane": "verify",
       "exists": true,
-      "digest": "sha256:ae0f8e6cafbb4c39732e6a7252d46b523b0a69e8e05d3ce7ee0b51a916b1b027"
+      "digest": "sha256:b1611dcf0e6825e53921e4c9d31d1afe16fca81e6868360bfad1902587cd52ef"
     },
     {
       "id": "consumer-issue-reporting",
@@ -197,7 +202,7 @@
       "path": "docs/cli.md",
       "plane": "use",
       "exists": true,
-      "digest": "sha256:758625143a51d0fe66871220c52273ceaf5c7a47fc1a99bda4608e3ad587ae81"
+      "digest": "sha256:cd469502ffa52e1e92c4fcee6c4bcaae814953d64403e6772213479af823b0da"
     },
     {
       "id": "build-facts",
@@ -237,7 +242,7 @@
       "path": "docs/reusable-build-surface.md",
       "plane": "use",
       "exists": true,
-      "digest": "sha256:ff6f36e1db2be12df37ef076935b5583493742528d98403297678a0682b67dc2"
+      "digest": "sha256:4623468aa1601710f8d0d13b6ef9415f83197f5e705f3f42602011539d2079ba"
     },
     {
       "id": "publish-transaction",
