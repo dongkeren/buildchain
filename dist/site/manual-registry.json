@@ -50,7 +50,7 @@
       "title": "GitHub-native Linux artifact attestation",
       "path": "docs/github-artifact-attestation.md",
       "plane": "verify",
-      "digest": "sha256:0dc16597e9ea4c0906bb0bc888fb7ac68b9f2ff19c2087f94bebd64bb8c834bd",
+      "digest": "sha256:84ee18ca88850f7a45d406d4fa7035492927851ad8263cbeeba94caba4c6cbc5",
       "capabilityGroup": "release-passport-trust",
       "audience": [
         "release-operator",

@@ -803,6 +803,15 @@ test("release-candidate promote workflow is promote-only and never schedules a h
   assert.match(workflow, /release-passport-invariant-passport-command: \$\{\{ inputs\.release-passport-invariant-passport-command \}\}/);
   assert.match(workflow, /release-passport-buildchain-self-kfd:/);
   assert.match(workflow, /release-passport-buildchain-self-kfd: \$\{\{ inputs\.release-passport-buildchain-self-kfd \}\}/);
+  assert.match(workflow, /github-artifact-attestation-policy-json:/);
+  assert.match(workflow, /release-passport-github-artifact-attestation-policy-jsons: \$\{\{ steps\.attestation-policy\.outputs\.path \}\}/);
+  assert.match(workflow, /name: Resolve GitHub artifact attestation policy/);
+  assert.match(workflow, /release-candidate-github-artifact-attestation-policy-paths/);
+  assert.match(workflow, /uses: kungfu-systems\/buildchain\/\.github\/workflows\/github-artifact-attestation\.yml@v3/);
+  assert.match(workflow, /artifact-metadata: write/);
+  assert.match(workflow, /attestations: write/);
+  assert.match(workflow, /name: Publish verified attestation evidence to GitHub Release/);
+  assert.match(workflow, /publish-github-artifact-attestation-evidence\.mjs/);
   assert.match(workflow, /DRY_RUN: \$\{\{ inputs\.dry-run \}\}/);
   assert.match(workflow, /const dryRun = process\.env\.DRY_RUN === "true"/);
   assert.match(workflow, /if \(dryRun\) \{\s+core\.notice\(`Dry-run would lock/);
@@ -879,7 +888,10 @@ test("release-candidate promote workflow is promote-only and never schedules a h
   );
   assert.match(workflow, /require-publication-qualification: \$\{\{ needs\.publication-qualification\.outputs\.required \}\}/);
   assert.match(workflow, /publication-qualification-receipt-json: \$\{\{ needs\.publication-qualification\.outputs\.receipt-json \}\}/);
-  assert.doesNotMatch(workflow, /^ {4}environment\s*:/m);
+  assert.match(
+    workflow,
+    /^ {4}environment: \$\{\{ inputs\.github-artifact-attestation-environment \}\}$/m,
+  );
   assert.match(workflow, /token: \$\{\{ github\.token \}\}/);
   assert.match(
     workflow,
@@ -2386,6 +2398,10 @@ test("reusable build exposes release-candidate passport outputs", () => {
   );
 
   assert.match(workflow, /release-candidate:/);
+  assert.match(workflow, /github-artifact-attestation-subject-path:/);
+  assert.match(workflow, /name: Create GitHub artifact attestation policy/);
+  assert.match(workflow, /create-github-artifact-attestation-policy\.mjs/);
+  assert.match(workflow, /name: Upload GitHub artifact attestation policy/);
   assert.match(workflow, /publish-source-tree-sha:/);
   assert.match(workflow, /Resolve source tree SHA/);
   assert.match(workflow, /Generate release candidate passport/);
@@ -2558,6 +2574,7 @@ test("promote action exposes promote-only release candidate inputs", () => {
   assert.match(action, /release-passport-invariant-passport-jsons:/);
   assert.match(action, /release-passport-invariant-passport-command:/);
   assert.match(action, /release-passport-buildchain-self-kfd:/);
+  assert.match(action, /release-passport-github-artifact-attestation-policy-jsons:/);
   assert.match(action, /publish-rematerialize-on-resume:/);
   assert.match(implementation, /promoteOnlyReleaseCandidate/);
   assert.match(implementation, /reconciliationWorkspace/);
@@ -2569,6 +2586,7 @@ test("promote action exposes promote-only release candidate inputs", () => {
   assert.match(implementation, /releasePassportInvariantPassportJsons/);
   assert.match(implementation, /releasePassportInvariantPassportCommand/);
   assert.match(implementation, /releasePassportBuildchainSelfKfd/);
+  assert.match(implementation, /releasePassportGitHubArtifactAttestationPolicyJsons/);
   assert.match(implementation, /publishRematerializeOnResume/);
   assert.match(docs, /promote-only-release-candidate: "true"/);
   assert.match(docs, /release-passport-kfd-1-witness-jsons/);

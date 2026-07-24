@@ -86,7 +86,7 @@
       "specifier": "@kungfu-tech/buildchain/github-artifact-attestation",
       "export": "./github-artifact-attestation",
       "target": "./packages/core/github-artifact-attestation.js",
-      "digest": "sha256:3b16bf71e30236dfe1637382ef24a972269c86652e1b42dc45d32b2dc73c1659",
+      "digest": "sha256:8f26572119cfe7fe4b7db332b445446d1448b2f76f6076b37ea069bc039fc086",
       "summary": "GitHub keyless artifact attestation policy, predicate, provider evidence, and fail-closed verification APIs.",
       "capabilityGroup": "release-passport-trust",
       "audience": [
@@ -112,7 +112,7 @@
       "specifier": "@kungfu-tech/buildchain/buildchain-contract",
       "export": "./buildchain-contract",
       "target": "./packages/core/buildchain-contract.js",
-      "digest": "sha256:cf08a6c4fd2a56dff45e4a97d1c470ce94e453ab613a304bd86b3fe9d298a153",
+      "digest": "sha256:c140e6b00502eb0d0e6bf87f243c79d40bb1f39427c7d90f8921b12345b32855",
       "summary": "Runtime contract world and compatibility digest APIs for floating-ref drift checks.",
       "capabilityGroup": "governance-versioning",
       "audience": [

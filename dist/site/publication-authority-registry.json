@@ -572,7 +572,8 @@
       "path": ".github/workflows/.release-candidate-promote.yml",
       "signals": [
         "write-permission",
-        "oidc"
+        "oidc",
+        "environment"
       ],
       "classified": true
     },
@@ -894,5 +895,5 @@
       "classified": false
     }
   ],
-  "registryDigest": "72b1eb19a19661a55c30b27081ff5f8430c4d6721b1b043e64bd902888c266fb"
+  "registryDigest": "9d0ddd9de076c1544c0c9ca6cd9baf27f6856fb251305616f554ec6ce2d1db0a"
 }

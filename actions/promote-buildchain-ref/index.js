@@ -311,6 +311,9 @@ async function main() {
   const releasePassportInvariantPassportJsons = core.getInput("release-passport-invariant-passport-jsons");
   const releasePassportInvariantPassportCommand = core.getInput("release-passport-invariant-passport-command");
   const releasePassportBuildchainSelfKfd = core.getBooleanInput("release-passport-buildchain-self-kfd");
+  const releasePassportGitHubArtifactAttestationPolicyJsons = core.getInput(
+    "release-passport-github-artifact-attestation-policy-jsons",
+  );
   const githubRelease = core.getBooleanInput("github-release");
   const githubReleaseArtifactPaths = core.getMultilineInput("github-release-artifact-paths")
     .map((entry) => entry.trim())
@@ -399,6 +402,7 @@ async function main() {
     releasePassportInvariantPassportJsons,
     releasePassportInvariantPassportCommand,
     releasePassportBuildchainSelfKfd,
+    releasePassportGitHubArtifactAttestationPolicyJsons,
     promoteOnlyReleaseCandidate,
     releaseCandidatePassportPath,
     releaseCandidateBuildSummaryPath,

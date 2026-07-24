@@ -519,6 +519,8 @@
           "expected-artifacts-json",
           "fail-fast",
           "gate-profile-aggregate-json",
+          "github-artifact-attestation-platform-id",
+          "github-artifact-attestation-subject-path",
           "install-command",
           "kfd-agent-hub",
           "lifecycle-timeout-minutes",
@@ -552,7 +554,7 @@
           "verify-command",
           "working-directory"
         ],
-        "inputCount": 65,
+        "inputCount": 67,
         "secrets": [
           "BUILDCHAIN_ARTIFACT_RELAY_S3_DOWNLOAD_ROLE_ARN",
           "BUILDCHAIN_ARTIFACT_RELAY_S3_ROLE_ARN",
@@ -739,6 +741,9 @@
           "buildchain-repository",
           "channel",
           "dry-run",
+          "github-artifact-attestation-environment",
+          "github-artifact-attestation-policy-json",
+          "github-artifact-attestation-retention-days",
           "github-governance-receipt-json",
           "github-release",
           "github-release-notes",
@@ -805,7 +810,7 @@
           "target-sha",
           "trusted-publishing"
         ],
-        "inputCount": 78,
+        "inputCount": 81,
         "secrets": [
           "BUILDCHAIN_ISSUE_APP_ID",
           "BUILDCHAIN_ISSUE_APP_PRIVATE_KEY",
@@ -828,6 +833,10 @@
           "controller-receipt-digest",
           "controller-receipt-json",
           "controller-receipt-status",
+          "github-artifact-attestation-evidence-root",
+          "github-artifact-attestation-id",
+          "github-artifact-attestation-publication-receipt-digest",
+          "github-artifact-attestation-url",
           "promoted-sha",
           "publication-capability-digest",
           "publication-commit-evidence-digest",
@@ -836,7 +845,7 @@
           "publication-commit-url",
           "release-candidate-artifact"
         ],
-        "outputCount": 15
+        "outputCount": 19
       },
       {
         "id": ".release-docker",
@@ -1262,6 +1271,8 @@
           "expected-artifacts-json",
           "fail-fast",
           "gate-profile-aggregate-json",
+          "github-artifact-attestation-platform-id",
+          "github-artifact-attestation-subject-path",
           "install-command",
           "kfd-agent-hub",
           "lifecycle-timeout-minutes",
@@ -1295,7 +1306,7 @@
           "verify-command",
           "working-directory"
         ],
-        "inputCount": 68,
+        "inputCount": 70,
         "secrets": [
           "BUILDCHAIN_ARTIFACT_RELAY_S3_DOWNLOAD_ROLE_ARN",
           "BUILDCHAIN_ARTIFACT_RELAY_S3_ROLE_ARN",
@@ -1566,10 +1577,11 @@
           "release-passport-artifact-name",
           "release-passport-relative-path",
           "retention-days",
+          "source-sha",
           "subject-artifact-name",
           "subject-relative-path"
         ],
-        "inputCount": 12,
+        "inputCount": 13,
         "secrets": [],
         "secretCount": 0,
         "outputs": [
@@ -1890,6 +1902,9 @@
           "buildchain-stable-contract-lock-path",
           "channel",
           "dry-run",
+          "github-artifact-attestation-environment",
+          "github-artifact-attestation-policy-json",
+          "github-artifact-attestation-retention-days",
           "github-governance-receipt-json",
           "github-release",
           "github-release-notes",
@@ -1945,7 +1960,7 @@
           "target-sha",
           "trusted-publishing"
         ],
-        "inputCount": 70,
+        "inputCount": 73,
         "secrets": [
           "BUILDCHAIN_ISSUE_APP_ID",
           "BUILDCHAIN_ISSUE_APP_PRIVATE_KEY",
@@ -1969,6 +1984,10 @@
           "controller-receipt-digest",
           "controller-receipt-json",
           "controller-receipt-status",
+          "github-artifact-attestation-evidence-root",
+          "github-artifact-attestation-id",
+          "github-artifact-attestation-publication-receipt-digest",
+          "github-artifact-attestation-url",
           "promoted-sha",
           "promotion-contract-lock-digest",
           "promotion-contract-lock-path",
@@ -1988,7 +2007,7 @@
           "publication-commit-url",
           "release-candidate-artifact"
         ],
-        "outputCount": 27
+        "outputCount": 31
       },
       {
         "id": "release-governance-reconcile",
@@ -2243,6 +2262,7 @@
           "release-passport",
           "release-passport-build-summary-path",
           "release-passport-buildchain-self-kfd",
+          "release-passport-github-artifact-attestation-policy-jsons",
           "release-passport-impact-json",
           "release-passport-invariant-passport-command",
           "release-passport-invariant-passport-jsons",
@@ -2267,7 +2287,7 @@
           "transaction-state-path",
           "verification-command"
         ],
-        "inputCount": 63
+        "inputCount": 64
       },
       {
         "id": "report-buildchain-issue",
@@ -3997,8 +4017,8 @@
     "workflowRegistryPath": "dist/site/workflow-registry.json",
     "pageRegistryPath": "dist/site/page-registry.json",
     "cliRegistryDigest": "c9d0f73b7084ee6f132230f8b1d44edf40dab37092f73dfd7075aa9a7f6a6547",
-    "workflowRegistryDigest": "bccbde1c8d7cd16ccac2f64c697307efb1ee59b3514e4f116c3f1127b334a1d4",
-    "pageRegistryDigest": "632d4a6b83ff418069f41da112af73eca51a2834d0c911236eda5ce5f76505d2"
+    "workflowRegistryDigest": "22ef96a5c1e30d8885adb079b87a51bd10231e9a19a1a30513b3984e475c7198",
+    "pageRegistryDigest": "1fad6139d5070cd73ff9c400aab6b7ccfad9aa10b4887c5fb8c5cf8333225821"
   },
   "comparison": {
     "missingCliRegistry": [],

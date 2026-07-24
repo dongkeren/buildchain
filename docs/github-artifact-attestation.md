@@ -53,7 +53,8 @@ The Release Passport first records
 
 - artifact name, relative path, byte size, and SHA-256;
 - caller repository, source commit, and source tree;
-- original Linux platform, platform-manifest digest, and runner receipt root;
+- original Linux platform and platform-manifest digest; the initial v3 contract
+  requires the runner receipt root to equal that exact manifest digest;
 - Buildchain signer workflow path and exact Buildchain commit;
 - exact GitHub permission set.
 
@@ -108,7 +109,39 @@ buildchain collect github-release \
 ```
 
 The build, Passport, and attestation jobs must stay in the same workflow run.
-Call the reusable attester after the Passport job and pin Buildchain exactly:
+For release promotion, prefer the integrated v3 route. The policy must already
+be present in the downloaded release-candidate payload:
+
+```yaml
+permissions:
+  actions: write
+  artifact-metadata: write
+  attestations: write
+  checks: write
+  contents: write
+  id-token: write
+  issues: write
+
+jobs:
+  promote:
+    uses: kungfu-systems/buildchain/.github/workflows/release-candidate-promote.yml@v3
+    with:
+      buildchain-ref: v3
+      github-release: true
+      release-passport: true
+      github-artifact-attestation-policy-json: .buildchain/release-candidate/payload/<artifact>/policy.json
+      github-artifact-attestation-environment: buildchain-artifact-attestation
+```
+
+Promotion binds the policy into the Passport, stages only digest-matching data,
+calls the exact v3 signer, verifies the provider identity a second time, and
+publishes immutable bundle, predicate, verification, evidence, and receipt
+assets beside the release artifact. A same-name Release asset with different
+bytes is rejected instead of overwritten.
+
+Low-level callers may call the reusable attester directly after their Passport
+job. The public workflow stays on `@v3`; `buildchain-ref` carries the exact
+40-hex v3 commit and fails closed if the signer identity differs:
 
 ```yaml
 jobs:
@@ -120,10 +153,11 @@ jobs:
       attestations: write
       contents: read
       id-token: write
-    uses: kungfu-systems/buildchain/.github/workflows/github-artifact-attestation.yml@<exact-buildchain-sha>
+    uses: kungfu-systems/buildchain/.github/workflows/github-artifact-attestation.yml@v3
     with:
       buildchain-ref: <exact-buildchain-sha>
       evidence-run-id: ${{ github.run_id }}
+      source-sha: ${{ github.sha }}
       subject-artifact-name: linux-release
       subject-relative-path: libnode-linux-x64.tar.gz
       platform-manifest-artifact-name: linux-platform-manifest
@@ -163,7 +197,8 @@ expected statement, or GitHub reports a self-hosted signer.
 
 ## Qualification Policy
 
-New protocol work qualifies on the Buildchain v3 alpha line first. Production
+New protocol work qualifies on the Buildchain v3 alpha line first. The v2
+development branch is not a supported landing target. Production
 adoption waits for the exact v3 implementation commit to pass the repository
 suite and a real GitHub OIDC/Sigstore qualification run, including the negative
 cases above. A successful local fixture is necessary but not sufficient.

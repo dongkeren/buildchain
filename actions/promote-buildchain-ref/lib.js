@@ -2305,6 +2305,7 @@ async function collectAndPersistReleasePassport({
   invariantPassportJsons = [],
   invariantPassportCommand = "",
   buildchainSelfKfd = false,
+  githubArtifactAttestationPolicyJsons = [],
   enabled = true,
   releaseCandidateValidation = undefined,
 }) {
@@ -2407,6 +2408,7 @@ async function collectAndPersistReleasePassport({
     kfd3ArtifactVerifyCommand,
     invariantPassportJsons,
     invariantPassportCommand,
+    githubArtifactAttestationPolicyJsons,
     buildSummaryJson,
     platformManifestJsons: platformManifests,
     distTagEvidenceJson: existingJsonObjectFile(result.distTagEvidencePath),
@@ -3641,6 +3643,7 @@ async function promoteBuildchainRefs({
   releasePassportInvariantPassportJsons = "",
   releasePassportInvariantPassportCommand = "",
   releasePassportBuildchainSelfKfd = false,
+  releasePassportGitHubArtifactAttestationPolicyJsons = "",
   promoteOnlyReleaseCandidate = false,
   releaseCandidatePassportPath = ".buildchain/artifacts/release-candidate-passport.json",
   releaseCandidateBuildSummaryPath = ".buildchain/artifacts/build-summary.json",
@@ -5110,6 +5113,9 @@ async function promoteBuildchainRefs({
       invariantPassportJsons: splitPathList(releasePassportInvariantPassportJsons),
       invariantPassportCommand: releasePassportInvariantPassportCommand,
       buildchainSelfKfd: Boolean(releasePassportBuildchainSelfKfd),
+      githubArtifactAttestationPolicyJsons: splitPathList(
+        releasePassportGitHubArtifactAttestationPolicyJsons,
+      ),
       enabled: Boolean(releasePassport),
       releaseCandidateValidation,
     });

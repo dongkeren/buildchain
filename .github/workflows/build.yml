@@ -188,6 +188,16 @@ on:
           build/stage
         type: string
         required: false
+      github-artifact-attestation-subject-path:
+        description: "Optional exact artifact path to bind to a GitHub keyless attestation policy after the final platform manifest is sealed"
+        default: ""
+        type: string
+        required: false
+      github-artifact-attestation-platform-id:
+        description: "Linux platform id that owns github-artifact-attestation-subject-path"
+        default: "linux-x64"
+        type: string
+        required: false
       credential-island-macos-app-path:
         description: "Optional exact .app path to seal for a protected macOS credential-island job"
         default: ""
@@ -687,6 +697,8 @@ jobs:
       artifact-name: ${{ inputs.artifact-name }}
       artifact-name-template: ${{ inputs.artifact-name-template }}
       artifact-paths: ${{ inputs.artifact-paths }}
+      github-artifact-attestation-subject-path: ${{ inputs.github-artifact-attestation-subject-path }}
+      github-artifact-attestation-platform-id: ${{ inputs.github-artifact-attestation-platform-id }}
       credential-island-macos-app-path: ${{ inputs.credential-island-macos-app-path }}
       credential-island-environment: ${{ inputs.credential-island-environment }}
       credential-island-caller-owned: ${{ inputs.credential-island-caller-owned }}
